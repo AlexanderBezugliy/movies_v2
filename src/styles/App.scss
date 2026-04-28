@@ -1,0 +1,38 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  &__main {
+    flex: 1;
+  }
+
+  &__footer {
+    padding: 40px 0;
+    background: var(--color-bg-secondary);
+    border-top: 1px solid var(--color-glass-border);
+
+    &-content {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 40px;
+      text-align: center;
+
+      @media (max-width: 768px) {
+        padding: 0 20px;
+      }
+    }
+
+    &-text {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+    }
+
+    &-powered {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      opacity: 0.6;
+    }
+  }
+}
