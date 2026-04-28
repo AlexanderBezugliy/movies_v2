@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { getImageUrl } from '../../config/api';
 import './MovieCard.scss';
 
-const MovieCard = ({ movie, genres, index, language }) => {
+const MovieCard = ({ movie, genres, index, language, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef(null);
   const [transform, setTransform] = useState({ rotateX: 0, rotateY: 0, scale: 1 });
@@ -41,6 +41,7 @@ const MovieCard = ({ movie, genres, index, language }) => {
     <motion.div
       ref={cardRef}
       className="movie-card"
+      onClick={onClick}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}

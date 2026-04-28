@@ -3,7 +3,7 @@ import { motion, useInView } from 'framer-motion';
 import MovieCard from '../MovieCard';
 import './MoviesGrid.scss';
 
-const MoviesGrid = ({ movies, genres, language }) => {
+const MoviesGrid = ({ movies, genres, language, onMovieSelect }) => {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
@@ -58,6 +58,7 @@ const MoviesGrid = ({ movies, genres, language }) => {
               genres={genres}
               index={index}
               language={language}
+              onClick={() => onMovieSelect(movie)}
             />
           ))}
         </motion.div>
