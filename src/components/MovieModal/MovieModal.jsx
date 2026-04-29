@@ -1,9 +1,12 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getImageUrl } from '../../config/api';
+import { getImageUrl, FALLBACK_BACKDROP, FALLBACK_IMAGE } from '../../config/api';
 import './MovieModal.scss';
 
 const MovieModal = ({ movie, isOpen, onClose, language, loading }) => {
+  const [backdropError, setBackdropError] = useState(false);
+  const [posterError, setPosterError] = useState(false);
+
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Escape') {
       onClose();
@@ -20,6 +23,11 @@ const MovieModal = ({ movie, isOpen, onClose, language, loading }) => {
       document.body.style.overflow = '';
     };
   }, [isOpen, handleKeyDown]);
+
+  useEffect(() => {
+    setBackdropError(false);
+    setPosterError(false);
+  }, [movie?.id]);
 
   if (!movie) return null;
 
@@ -97,8 +105,19 @@ const MovieModal = ({ movie, isOpen, onClose, language, loading }) => {
                 />
               ) : (
                 <div className="modal__video-fallback">
-                  {backdropUrl && (
-                    <img src={backdropUrl} alt={title} className="modal__backdrop-fallback" />
+                  {backdropUrl && !backdropError ? (
+                    <img 
+                      src={backdropUrl} 
+                      alt={title} 
+                      className="modal__backdrop-fallback"
+                      onError={() => setBackdropError(true)}
+                    />
+                  ) : (
+                    <img 
+                      src={FALLBACK_BACKDROP} 
+                      alt={title} 
+                      className="modal__backdrop-fallback"
+                    />
                   )}
                   <div className="modal__no-trailer">
                     <span>🎬</span>
@@ -111,7 +130,18 @@ const MovieModal = ({ movie, isOpen, onClose, language, loading }) => {
             <div className="modal__content">
               <div className="modal__header">
                 <div className="modal__poster">
-                  {posterUrl && <img src={posterUrl} alt={title} />}
+                  {posterUrl && !posterError ? (
+                    <img 
+                      src={posterUrl} 
+                      alt={title}
+                      onError={() => setPosterError(true)}
+                    />
+                  ) : (
+                    <img 
+                      src={FALLBACK_IMAGE} 
+                      alt={title}
+                    />
+                  )}
                 </div>
                 <div className="modal__info">
                   <h2 className="modal__title">{title}</h2>

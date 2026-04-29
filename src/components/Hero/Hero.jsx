@@ -1,14 +1,23 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { getImageUrl } from '../../config/api';
 import './Hero.scss';
 
-const Hero = ({ movie, language }) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
+const Hero = ({ language }) => {
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
-    setImageLoaded(false);
-  }, [movie?.id]);
+    setVideoLoaded(true);
+  }, []);
+
+  const handleVideoCanPlay = () => {
+    setVideoLoaded(true);
+    setVideoError(false);
+  };
+
+  const handleVideoError = () => {
+    setVideoError(true);
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -16,7 +25,7 @@ const Hero = ({ movie, language }) => {
       opacity: 1,
       transition: {
         staggerChildren: 0.2,
-        delayChildren: 0.3,
+        delayChildren: 0.5,
       },
     },
   };
@@ -33,36 +42,35 @@ const Hero = ({ movie, language }) => {
     },
   };
 
-  if (!movie) {
-    return (
-      <section className="hero" id="hero">
-        <div className="hero__loading">
-          <div className="hero__spinner"></div>
-        </div>
-      </section>
-    );
-  }
-
-  const backdropUrl = getImageUrl(movie.backdrop_path, 'original');
-  const posterUrl = getImageUrl(movie.poster_path, 'w500');
-
-  const title = language === 'ru-RU' ? movie.title : movie.original_title;
-  const overview = language === 'ru-RU' ? movie.overview : movie.original_overview;
+  const title = language === 'ru-RU' ? 'Кинофестиваль' : 'Cinema Festival';
+  const subtitle = language === 'ru-RU' 
+    ? 'Откройте мир лучших фильмов со всего мира' 
+    : 'Discover the world\'s best films';
 
   return (
     <section className="hero" id="hero">
-      <div className="hero__backdrop">
-        {backdropUrl && (
-          <>
-            <img 
-              src={backdropUrl} 
-              alt={title} 
-              className={`hero__backdrop-img ${imageLoaded ? 'loaded' : ''}`}
-              onLoad={() => setImageLoaded(true)}
+      <div className="hero__video-container">
+        {!videoError && (
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            className={`hero__video ${videoLoaded ? 'loaded' : ''}`}
+            onCanPlay={handleVideoCanPlay}
+            onError={handleVideoError}
+          >
+            <source 
+              src="https://res.cloudinary.com/dfonotyfb/video/upload/v1775585556/dds3_1_rqhg7x.mp4" 
+              type="video/mp4" 
             />
-            <div className="hero__backdrop-overlay"></div>
-          </>
+          </video>
         )}
+        {videoError && (
+          <div className="hero__video-fallback"></div>
+        )}
+        <div className="hero__video-overlay"></div>
+        <div className="hero__video-gradient"></div>
       </div>
 
       <div className="hero__content">
@@ -74,32 +82,16 @@ const Hero = ({ movie, language }) => {
         >
           <motion.div className="hero__badge" variants={itemVariants}>
             <span className="hero__badge-icon">★</span>
-            <span>{language === 'ru-RU' ? 'Топовый фильм' : 'Top Movie'}</span>
-            <span className="hero__badge-rating">{movie.vote_average?.toFixed(1)}</span>
+            <span>{language === 'ru-RU' ? 'Премьера' : 'Premiere'}</span>
           </motion.div>
 
           <motion.h1 className="hero__title" variants={itemVariants}>
             {title}
           </motion.h1>
 
-          <motion.p className="hero__overview" variants={itemVariants}>
-            {overview?.slice(0, 200)}
-            {(overview?.length > 200) && '...'}
+          <motion.p className="hero__subtitle" variants={itemVariants}>
+            {subtitle}
           </motion.p>
-
-          <motion.div className="hero__meta" variants={itemVariants}>
-            <span className="hero__meta-year">
-              {movie.release_date?.split('-')[0]}
-            </span>
-            <span className="hero__meta-divider">•</span>
-            <span className="hero__meta-rating">
-              {movie.adult ? '18+' : '16+'}
-            </span>
-            <span className="hero__meta-divider">•</span>
-            <span className="hero__meta-popularity">
-              #{movie.popularity?.toFixed(0)} {language === 'ru-RU' ? 'популярности' : 'popularity'}
-            </span>
-          </motion.div>
 
           <motion.div className="hero__actions" variants={itemVariants}>
             <button className="hero__btn hero__btn--primary">

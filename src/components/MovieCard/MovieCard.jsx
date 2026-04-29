@@ -1,12 +1,13 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { getImageUrl } from '../../config/api';
+import { getImageUrl, FALLBACK_IMAGE } from '../../config/api';
 import './MovieCard.scss';
 
 const MovieCard = ({ movie, genres, index, language, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef(null);
   const [transform, setTransform] = useState({ rotateX: 0, rotateY: 0, scale: 1 });
+  const [imageError, setImageError] = useState(false);
 
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
@@ -61,9 +62,16 @@ const MovieCard = ({ movie, genres, index, language, onClick }) => {
       <div className={`movie-card__glow ${isHovered ? 'active' : ''}`}></div>
       
       <div className="movie-card__poster-wrapper">
-        {posterUrl ? (
+        {posterUrl && !imageError ? (
           <img 
             src={posterUrl} 
+            alt={title}
+            className="movie-card__poster"
+            onError={() => setImageError(true)}
+          />
+        ) : imageError ? (
+          <img 
+            src={FALLBACK_IMAGE} 
             alt={title}
             className="movie-card__poster"
           />

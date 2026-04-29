@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import MoviesGrid from './components/MoviesGrid';
+import BottomFeature from './components/BottomFeature';
 import MovieModal from './components/MovieModal';
 import { useGenres, useNowPlayingMovies, useMovieFullData } from './hooks/useTMDB';
 import './styles/App.scss';
@@ -34,10 +35,6 @@ function App() {
     return genresData?.genres || [];
   }, [genresData]);
 
-  const topMovie = useMemo(() => {
-    return nowPlayingData?.results?.[0] || null;
-  }, [nowPlayingData]);
-
   const movies = useMemo(() => {
     return nowPlayingData?.results || [];
   }, [nowPlayingData]);
@@ -52,10 +49,7 @@ function App() {
       <Header language={language} onLanguageChange={handleLanguageChange} />
       
       <main className="app__main">
-        <Hero 
-          movie={topMovie} 
-          language={language}
-        />
+        <Hero language={language} />
         
         <MoviesGrid 
           movies={movies} 
@@ -63,6 +57,8 @@ function App() {
           language={language}
           onMovieSelect={handleMovieSelect}
         />
+
+        <BottomFeature language={language} />
       </main>
 
       <footer className="app__footer">
