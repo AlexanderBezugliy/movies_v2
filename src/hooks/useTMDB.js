@@ -42,6 +42,10 @@ export const useGenres = (language = 'ru-RU') => {
   return useTMDB('/genre/movie/list', { language });
 };
 
+export const useTVGenres = (language = 'ru-RU') => {
+  return useTMDB('/genre/tv/list', { language });
+};
+
 export const usePopularMovies = (language = 'ru-RU', page = 1) => {
   return useTMDB('/movie/popular', { language, page });
 };
@@ -100,4 +104,44 @@ export const useMovieFullData = (movieId, language = 'ru-RU') => {
   }, [movieId, language]);
 
   return { data: movieData, loading, error };
+};
+
+export const useTVShowFullData = (tvShowId, language = 'ru-RU') => {
+  const [tvShowData, setTvShowData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!tvShowId) return;
+
+    const fetchFullData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const params = new URLSearchParams({
+          api_key: API_KEY,
+          language,
+          append_to_response: 'videos',
+        });
+
+        const response = await fetch(`${BASE_URL}/tv/${tvShowId}?${params}`);
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+
+        const result = await response.json();
+        setTvShowData(result);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFullData();
+  }, [tvShowId, language]);
+
+  return { data: tvShowData, loading, error };
 };

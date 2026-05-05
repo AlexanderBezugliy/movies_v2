@@ -1,22 +1,42 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import './Hero.scss';
 
 const Hero = ({ language }) => {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const heroRef = useRef(null);
 
-  useEffect(() => {
-    setVideoLoaded(true);
-  }, []);
+  const { scrollY } = useScroll();
+  const titleY = useTransform(scrollY, [0, 500], [0, 150]);
+  const titleOpacity = useTransform(scrollY, [0, 300], [1, 0]);
+  const subtitleY = useTransform(scrollY, [0, 400], [0, 100]);
+  const subtitleOpacity = useTransform(scrollY, [0, 250], [1, 0]);
 
   const handleVideoCanPlay = () => {
     setVideoLoaded(true);
+    setIsLoading(false);
     setVideoError(false);
+  };
+
+  const handleVideoLoadedData = () => {
+    setVideoLoaded(true);
+    setIsLoading(false);
   };
 
   const handleVideoError = () => {
     setVideoError(true);
+    setIsLoading(false);
+    setVideoLoaded(false);
+  };
+
+  const handleVideoWaiting = () => {
+    setIsLoading(true);
+  };
+
+  const handleVideoPlaying = () => {
+    setIsLoading(false);
   };
 
   const containerVariants = {
@@ -24,17 +44,18 @@ const Hero = ({ language }) => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.5,
+        staggerChildren: 0.15,
+        delayChildren: 0.3,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 40, rotateX: 15 },
     visible: {
       opacity: 1,
       y: 0,
+      rotateX: 0,
       transition: {
         duration: 0.8,
         ease: [0.25, 0.46, 0.45, 0.94],
@@ -42,30 +63,41 @@ const Hero = ({ language }) => {
     },
   };
 
-  const title = language === 'ru-RU' ? 'Кинофестиваль' : 'Cinema Festival';
+  const title = language === 'ru-RU' ? 'Кино фестиваль' : 'Cinema Festival';
   const subtitle = language === 'ru-RU' 
     ? 'Откройте мир лучших фильмов со всего мира' 
     : 'Discover the world\'s best films';
 
   return (
-    <section className="hero" id="hero">
+    <section className="hero" id="hero" ref={heroRef}>
       <div className="hero__video-container">
+        {isLoading && !videoError && (
+          <div className="hero__loading">
+            <div className="hero__spinner"></div>
+          </div>
+        )}
+        
         {!videoError && (
-          <video 
-            autoPlay 
-            loop 
-            muted 
-            playsInline 
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
             className={`hero__video ${videoLoaded ? 'loaded' : ''}`}
             onCanPlay={handleVideoCanPlay}
+            onLoadedData={handleVideoLoadedData}
             onError={handleVideoError}
+            onWaiting={handleVideoWaiting}
+            onPlaying={handleVideoPlaying}
           >
             <source 
-              src="https://res.cloudinary.com/dfonotyfb/video/upload/v1775585556/dds3_1_rqhg7x.mp4" 
+              src="/assets/video/video.mp4" 
               type="video/mp4" 
             />
           </video>
         )}
+        
         {videoError && (
           <div className="hero__video-fallback"></div>
         )}
@@ -80,28 +112,53 @@ const Hero = ({ language }) => {
           initial="hidden"
           animate="visible"
         >
-          <motion.div className="hero__badge" variants={itemVariants}>
-            <span className="hero__badge-icon">★</span>
-            <span>{language === 'ru-RU' ? 'Премьера' : 'Premiere'}</span>
+          <motion.div 
+            className="hero__title-wrapper"
+            variants={itemVariants}
+            style={{ y: titleY, opacity: titleOpacity }}
+          >
+            <span className="hero__title" data-text={title}>
+              {title}
+            </span>
+            <span className="hero__title hero__title-3d-layer" aria-hidden="true">
+              {title}
+            </span>
+            <span className="hero__title hero__title-3d-layer-2" aria-hidden="true">
+              {title}
+            </span>
+            <motion.div 
+              className="hero__title-accent"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 1.2, duration: 0.8, ease: "easeOut" }}
+            />
           </motion.div>
 
-          <motion.h1 className="hero__title" variants={itemVariants}>
-            {title}
-          </motion.h1>
-
-          <motion.p className="hero__subtitle" variants={itemVariants}>
+          <motion.p 
+            className="hero__subtitle" 
+            variants={itemVariants}
+            style={{ y: subtitleY, opacity: subtitleOpacity }}
+          >
             {subtitle}
           </motion.p>
 
           <motion.div className="hero__actions" variants={itemVariants}>
-            <button className="hero__btn hero__btn--primary">
+            <motion.button 
+              className="hero__btn hero__btn--primary"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
               <span className="hero__btn-icon">▶</span>
               {language === 'ru-RU' ? 'Смотреть' : 'Watch Now'}
-            </button>
-            <button className="hero__btn hero__btn--secondary">
+            </motion.button>
+            <motion.button 
+              className="hero__btn hero__btn--secondary"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
               <span className="hero__btn-icon">+</span>
               {language === 'ru-RU' ? 'В избранное' : 'Add to Favorites'}
-            </button>
+            </motion.button>
           </motion.div>
         </motion.div>
       </div>

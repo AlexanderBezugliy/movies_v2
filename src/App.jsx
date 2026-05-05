@@ -4,13 +4,17 @@ import Hero from './components/Hero';
 import MoviesGrid from './components/MoviesGrid';
 import BottomFeature from './components/BottomFeature';
 import MovieModal from './components/MovieModal';
-import { useGenres, useNowPlayingMovies, useMovieFullData } from './hooks/useTMDB';
+import TVShowModal from './components/TVShowModal';
+import { useGenres, useTVGenres, useNowPlayingMovies, useMovieFullData, useTVShowFullData } from './hooks/useTMDB';
+import TVShowsGrid from './components/TVShowsGrid';
 import './styles/App.scss';
 
 function App() {
   const [language, setLanguage] = useState('ru-RU');
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [selectedMovieId, setSelectedMovieId] = useState(null);
+  const [selectedTVShow, setSelectedTVShow] = useState(null);
+  const [selectedTVShowId, setSelectedTVShowId] = useState(null);
 
   const handleLanguageChange = (newLanguage) => {
     setLanguage(newLanguage);
@@ -21,19 +25,33 @@ function App() {
     setSelectedMovieId(movie?.id || null);
   };
 
+  const handleTVShowSelect = (tvShow) => {
+    setSelectedTVShow(tvShow);
+    setSelectedTVShowId(tvShow?.id || null);
+  };
+
   const handleCloseModal = () => {
     setSelectedMovie(null);
     setSelectedMovieId(null);
+    setSelectedTVShow(null);
+    setSelectedTVShowId(null);
   };
 
   const { data: fullMovieData, loading: fullMovieLoading } = useMovieFullData(selectedMovieId, language);
 
+  const { data: fullTVShowData, loading: fullTVShowLoading } = useTVShowFullData(selectedTVShowId, language);
+
   const { data: nowPlayingData, loading: nowPlayingLoading } = useNowPlayingMovies(language);
   const { data: genresData, loading: genresLoading, error: genresError } = useGenres(language);
+  const { data: tvGenresData } = useTVGenres(language);
 
   const genres = useMemo(() => {
     return genresData?.genres || [];
   }, [genresData]);
+
+  const tvGenres = useMemo(() => {
+    return tvGenresData?.genres || [];
+  }, [tvGenresData]);
 
   const movies = useMemo(() => {
     return nowPlayingData?.results || [];
@@ -43,6 +61,11 @@ function App() {
     if (!fullMovieData) return selectedMovie;
     return { ...selectedMovie, ...fullMovieData };
   }, [fullMovieData, selectedMovie]);
+
+  const modalTVShow = useMemo(() => {
+    if (!fullTVShowData) return selectedTVShow;
+    return { ...selectedTVShow, ...fullTVShowData };
+  }, [fullTVShowData, selectedTVShow]);
 
   return (
     <div className="app">
@@ -56,6 +79,12 @@ function App() {
           genres={genres}
           language={language}
           onMovieSelect={handleMovieSelect}
+        />
+
+        <TVShowsGrid 
+          genres={tvGenres}
+          language={language}
+          onTVShowSelect={handleTVShowSelect}
         />
 
         <BottomFeature language={language} />
@@ -78,6 +107,14 @@ function App() {
         onClose={handleCloseModal}
         language={language}
         loading={fullMovieLoading}
+      />
+
+      <TVShowModal 
+        tvShow={modalTVShow}
+        isOpen={!!selectedTVShow}
+        onClose={handleCloseModal}
+        language={language}
+        loading={fullTVShowLoading}
       />
     </div>
   );
