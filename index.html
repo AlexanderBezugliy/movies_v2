@@ -12,5 +12,11 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <noscript>
+      <style>
+        html { scroll-behavior: auto !important; }
+        .header__nav-link:hover::after { width: 100%; }
+      </style>
+    </noscript>
   </body>
 </html>

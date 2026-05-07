@@ -58,6 +58,10 @@ export const useNowPlayingMovies = (language = 'ru-RU', page = 1) => {
   return useTMDB('/movie/now_playing', { language, page });
 };
 
+export const useUpcomingMovies = (language = 'ru-RU', page = 1) => {
+  return useTMDB('/movie/upcoming', { language, page });
+};
+
 export const useMovieVideos = (movieId, language = 'ru-RU') => {
   return useTMDB(`/movie/${movieId}/videos`, { language });
 };

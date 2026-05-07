@@ -129,7 +129,12 @@ const TVShowsGrid = ({ genres, language, onTVShowSelect }) => {
   };
 
   return (
-    <section className="tv-shows-grid" id="tv-shows" ref={sectionRef}>
+    <section 
+      className="tv-shows-grid" 
+      id="series" 
+      data-anchor="series"
+      ref={sectionRef}
+    >
       <div className="tv-shows-grid__container">
         <motion.div 
           className="tv-shows-grid__header"

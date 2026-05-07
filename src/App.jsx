@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
+import NewReleasesSlider from './components/NewReleasesSlider';
 import MoviesGrid from './components/MoviesGrid';
 import BottomFeature from './components/BottomFeature';
 import MovieModal from './components/MovieModal';
@@ -73,6 +74,11 @@ function App() {
       
       <main className="app__main">
         <Hero language={language} />
+        
+        <NewReleasesSlider 
+          language={language} 
+          onMovieSelect={handleMovieSelect}
+        />
         
         <MoviesGrid 
           movies={movies} 
